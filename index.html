@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Limpeza Semanal do Macho Alfa (Gabriel)</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #1e1e2f, #12121c);
+    color: white;
+    padding: 20px;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 5px;
+}
+
+.subtitulo {
+    text-align: center;
+    font-size: 13px;
+    opacity: 0.7;
+    margin-bottom: 25px;
+}
+
+.container {
+    max-width: 800px;
+    margin: auto;
+}
+
+.card {
+    background: #1f1f2e;
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+    transition: transform 0.2s ease;
+}
+
+.card:hover {
+    transform: scale(1.02);
+}
+
+h2 {
+    margin-top: 0;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+li {
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+}
+
+input[type="checkbox"] {
+    margin-right: 10px;
+    transform: scale(1.2);
+    cursor: pointer;
+}
+
+.progress-bar {
+    height: 8px;
+    background: #333;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 10px;
+}
+
+.progress {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #00c6ff, #0072ff);
+    transition: width 0.3s ease;
+}
+
+.counter {
+    font-size: 13px;
+    opacity: 0.8;
+    margin-top: 5px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>Limpeza Semanal do Macho Alfa (Gabriel)</h1>
+<div class="subtitulo">Missão semanal ativada.</div>
+
+<div class="container" id="app"></div>
+
+<script>
+const tarefas = {
+    "Segunda": [
+        "Varrer a casa",
+        "Passar o pano",
+        "Limpar a areia dos gatos",
+        "Lavar a louça",
+        "Ajeitar/Trocar colcha de cama",
+        "Limpar os ventiladores",
+        "Lavar a moto"
+    ],
+    "Terça-feira": [
+        "Varrer a casa",
+        "Limpar a areia dos gatos",
+        "Lavar a louça",
+        "Ajeitar o guarda roupa",
+        "Lavar roupa"
+    ],
+    "Quarta-feira": [
+        "Varrer a casa",
+        "Passar o pano",
+        "Limpar a areia dos gatos",
+        "Lavar a louça",
+        "Ajeitar o armário e limpar",
+        "Espanar a casa"
+    ],
+    "Quinta-feira": [
+        "Varrer a casa",
+        "Limpar a areia dos gatos",
+        "Lavar a louça",
+        "Limpar os móveis",
+        "Lavar a área"
+    ],
+    "Sexta-feira": [
+        "Varrer a casa",
+        "Passar o pano",
+        "Limpar a areia dos gatos",
+        "Lavar a louça",
+        "Lavar roupa"
+    ]
+};
+
+const app = document.getElementById("app");
+
+function salvarEstado() {
+    const estado = [];
+    document.querySelectorAll("input[type='checkbox']").forEach(cb => {
+        estado.push(cb.checked);
+    });
+    localStorage.setItem("checklistEstado", JSON.stringify(estado));
+}
+
+function carregarEstado() {
+    const estado = JSON.parse(localStorage.getItem("checklistEstado"));
+    if (!estado) return;
+    document.querySelectorAll("input[type='checkbox']").forEach((cb, i) => {
+        cb.checked = estado[i];
+    });
+}
+
+function atualizarProgresso(card) {
+    const checkboxes = card.querySelectorAll("input");
+    const total = checkboxes.length;
+    const marcados = [...checkboxes].filter(cb => cb.checked).length;
+    const porcentagem = (marcados / total) * 100;
+
+    card.querySelector(".progress").style.width = porcentagem + "%";
+    card.querySelector(".counter").textContent =
+        `${marcados} de ${total} tarefas concluídas`;
+}
+
+Object.keys(tarefas).forEach(dia => {
+    const card = document.createElement("div");
+    card.className = "card";
+
+    card.innerHTML = `
+        <h2>${dia}</h2>
+        <ul>
+            ${tarefas[dia].map(t => `
+                <li>
+                    <input type="checkbox">
+                    ${t}
+                </li>
+            `).join("")}
+        </ul>
+        <div class="progress-bar">
+            <div class="progress"></div>
+        </div>
+        <div class="counter"></div>
+    `;
+
+    card.querySelectorAll("input").forEach(cb => {
+        cb.addEventListener("change", () => {
+            salvarEstado();
+            atualizarProgresso(card);
+        });
+    });
+
+    app.appendChild(card);
+});
+
+carregarEstado();
+document.querySelectorAll(".card").forEach(card => atualizarProgresso(card));
+</script>
+
+</body>
+</html>
